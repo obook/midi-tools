@@ -140,6 +140,10 @@ class MainWindow(QMainWindow):
             note_on channel 0 note E6 [88,0x58] velocity 127
             note_on channel 0 note D#6 [87,0x57] velocity 0
             note_on channel 0 note E6 [88,0x58] velocity 0
+
+        Sustain on : control_change channel 0 control 64 value 127 time 0
+        Sustain off : control_change channel 0 control 64 value 0 time 0
+
         """
 
         text = f"{msg.type} "
