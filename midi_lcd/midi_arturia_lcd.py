@@ -23,8 +23,8 @@ def StringToDec(s):
     return dec
 
 
-LINE1 = StringToDec("Ballade No. 4 in F Minor, Op. 52.mid")
-LINE2 = StringToDec("CHOPIN FREDERIC")
+LINE1 = StringToDec("This is the fist line")
+LINE2 = StringToDec("And now the second line")
 
 msg = mido.Message('sysex', data=[])
 msg.data += KEYLAB_LCD_PRE
@@ -34,6 +34,6 @@ msg.data += LINE2
 msg.data += KEYLAB_LCD_END
 
 # Connect to synth : change here for your device
-device = mido.open_output("Arturia KeyLab Essential 61:Arturia KeyLab Essential 61 DAW")
+device = mido.open_output("Arturia KeyLab Essential 61:Arturia KeyLab Essential 61 MID")
 device.send(msg)
 device.close()
