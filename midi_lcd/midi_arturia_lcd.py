@@ -17,6 +17,8 @@ KEYLAB_LCD_END = [0x00]
 def StringToDec(s):
     dec = []
     for c in s:
+        if ord(c) > 127:  # only ASCII please...
+            c = " "
         dec.append(int(ord(c)))
         if len(dec) > 15:  # no more 16 chars please...
             break
@@ -24,7 +26,7 @@ def StringToDec(s):
 
 
 LINE1 = StringToDec("This is the fist line")
-LINE2 = StringToDec("And now the second line")
+LINE2 = StringToDec("And the second line")
 
 msg = mido.Message('sysex', data=[])
 msg.data += KEYLAB_LCD_PRE
