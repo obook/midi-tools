@@ -34,6 +34,9 @@ msg.data += LINE2
 msg.data += KEYLAB_LCD_END
 
 # Connect to synth : change here for your device
-device = mido.open_output("Arturia KeyLab Essential 61:Arturia KeyLab Essential 61 MID")
-device.send(msg)
-device.close()
+try:
+    device = mido.open_output("Arturia KeyLab Essential 61:Arturia KeyLab Essential 61 MID")
+    device.send(msg)
+    device.close()
+except Exception as error:
+    print("Send to device : ", error)
