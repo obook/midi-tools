@@ -62,9 +62,11 @@ class MainWindow(QMainWindow):
 
         self.Inputs, self.Outputs, self.InputsOutputs = self.GetDevices()
 
+        self.ui.InputDeviceCombo.addItem("")
         self.ui.InputDeviceCombo.addItems(self.Inputs)
         self.ui.InputDeviceCombo.currentIndexChanged.connect(self.InputDeviceChanged)
 
+        self.ui.OutputDeviceCombo.addItem("")
         self.ui.OutputDeviceCombo.addItems(self.Outputs)
         self.ui.OutputDeviceCombo.currentIndexChanged.connect(self.OutputDeviceComboChanged)
 
@@ -121,6 +123,7 @@ class MainWindow(QMainWindow):
             self.log_activity.emit(f"Send open_output [{device}]")
         except Exception as error:
             self.log_activity.emit(f"Send open_output [{device}] : {error}")
+            self.out_port = None
 
     def ClearSurfaceKeyboard(self):
         """Shutdown all lights from surface control (Arturia)."""
@@ -129,6 +132,10 @@ class MainWindow(QMainWindow):
             for key in keys:
                 msg = mido.Message('note_on', note=key, velocity=0)  # note_off do not works
                 self.out_port.send(msg)
+
+    def Send(self, msg):
+        if self.out_port:
+            self.out_port.send(msg)
 
     def callback(self, msg):
         """Handle MIDI events from device."""
@@ -170,8 +177,7 @@ class MainWindow(QMainWindow):
                     # Clear other
                     self.ClearSurfaceKeyboard()
                     # Lite Play key
-                    msg = mido.Message('note_on', note=94)
-                    self.out_port.send(msg)
+                    msg = mido.Message('note_on', note=msg.note)
 
                 elif msg.note == 93 and msg.velocity:
                     self.log_activity.emit("Stop")
@@ -180,7 +186,6 @@ class MainWindow(QMainWindow):
                     self.ClearSurfaceKeyboard()
                     # Lite Stop key
                     msg = mido.Message('note_on', note=93)
-                    self.out_port.send(msg)
 
                 elif msg.note == 95 and msg.velocity:
                     self.log_activity.emit("Record")
@@ -189,7 +194,6 @@ class MainWindow(QMainWindow):
                     self.ClearSurfaceKeyboard()
                     # Lite Record key
                     msg = mido.Message('note_on', note=95)
-                    self.out_port.send(msg)
 
                 elif msg.note == 86 and msg.velocity:
                     self.log_activity.emit("Cycle")
@@ -198,7 +202,6 @@ class MainWindow(QMainWindow):
                     self.ClearSurfaceKeyboard()
                     # Lite Cycle key
                     msg = mido.Message('note_on', note=86)
-                    self.out_port.send(msg)
 
                 elif msg.note == 91 and msg.velocity:
                     self.log_activity.emit("Rewind")
@@ -207,7 +210,6 @@ class MainWindow(QMainWindow):
                     self.ClearSurfaceKeyboard()
                     # Lite Rewind key
                     msg = mido.Message('note_on', note=91)
-                    self.out_port.send(msg)
 
                 elif msg.note == 92 and msg.velocity:
                     self.log_activity.emit("Forward")
@@ -216,7 +218,6 @@ class MainWindow(QMainWindow):
                     self.ClearSurfaceKeyboard()
                     # Lite Forward key
                     msg = mido.Message('note_on', note=92)
-                    self.out_port.send(msg)
 
                 elif msg.note == 80 and msg.velocity:
                     self.log_activity.emit("Save")
@@ -225,7 +226,6 @@ class MainWindow(QMainWindow):
                     self.ClearSurfaceKeyboard()
                     # Lite Save key
                     msg = mido.Message('note_on', note=80)
-                    self.out_port.send(msg)
 
                 elif msg.note == 81 and msg.velocity:
                     self.log_activity.emit("Undo")
@@ -234,7 +234,6 @@ class MainWindow(QMainWindow):
                     self.ClearSurfaceKeyboard()
                     # Lite Undo key
                     msg = mido.Message('note_on', note=81)
-                    self.out_port.send(msg)
 
                 elif msg.note == 89 and msg.velocity:
                     self.log_activity.emit("Click")
@@ -243,7 +242,6 @@ class MainWindow(QMainWindow):
                     self.ClearSurfaceKeyboard()
                     # Lite Click key
                     msg = mido.Message('note_on', note=89)
-                    self.out_port.send(msg)
 
         elif msg.type == 'control_change':
             text += f"channel {msg.channel} control {msg.control} value {msg.value} time {msg.time}"
@@ -260,6 +258,7 @@ class MainWindow(QMainWindow):
         else:
             print("---> PLEASE ADD : ", msg)
 
+        self.Send(msg)
         self.log_activity.emit(text)
 
     def LogMessage(self, text):
