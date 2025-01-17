@@ -10,6 +10,15 @@ QtCreator :
     In terminal, type :
         source .qtcreator/Python_3_12_3venv/bin/activate
         pip install PySide6 mido python-rtmidi
+
+Controller (DAW)
+----------------
+Linux use same port name for send and receive :
+Linux DAW open_input and open_output : [Arturia KeyLab Essential 61:Arturia KeyLab Essential 61 DAW]
+
+Windows use 2 differents ports for DAW :
+    Listen open_input [MIDIIN2 (Arturia KeyLab Essenti 2]
+    Send open_output [MIDIOUT2 (Arturia KeyLab Essent 4]
 '''
 
 # Important:
@@ -96,20 +105,22 @@ class MainWindow(QMainWindow):
 
         try:
             self.in_port = mido.open_input(device, callback=self.callback)
-            self.log_activity.emit(f"Listen {device}")
+            self.log_activity.emit(f"Listen open_input [{device}]")
         except Exception as error:
-            self.log_activity.emit(f"FROM {device} : {error}")
+            self.log_activity.emit(f"Listen open_input [{device}] : {error}")
 
 
     def OutputDeviceComboChanged(self):
         device = self.ui.OutputDeviceCombo.currentText()
+
         # OUTPUT-MIDI port
         if self.out_port:
             self.out_port.close()
         try:
             self.out_port = mido.open_output(device)
+            self.log_activity.emit(f"Send open_output [{device}]")
         except Exception as error:
-            self.log_activity.emit(f"TO {device} : {error}")
+            self.log_activity.emit(f"Send open_output [{device}] : {error}")
 
     def ClearSurfaceKeyboard(self):
         """Shutdown all lights from surface control (Arturia)."""
