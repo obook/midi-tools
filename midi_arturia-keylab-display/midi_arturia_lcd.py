@@ -65,6 +65,9 @@ DevicesList()
 # Windows :
 device_name = "Arturia KeyLab Essential 61 3"
 
+# Linux
+# device_name = "Arturia KeyLab Essential 61 DAW"
+
 LINE1 = StringToDec("This is the fist line")
 LINE2 = StringToDec("And the second line")
 
