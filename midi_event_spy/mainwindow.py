@@ -73,6 +73,8 @@ class MainWindow(QMainWindow):
         self.ui.plainTextEdit.setMaximumBlockCount(50)
         self.log_activity.connect(self.LogMessage)
 
+        self.keys = 0
+
     def GetDevices(self):
         """Retourne la liste des devices midi connectés à l'équipement."""
         Inputs = []
@@ -138,6 +140,26 @@ class MainWindow(QMainWindow):
             self.out_port.send(msg)
 
     def callback(self, msg):
+
+        # Keys pressed counter
+        if msg.type == "note_on":
+            if msg.velocity:
+                self.keys += 1
+            else:
+                # A MIDI Note On with a velocity of 0 is regarded as a Note Off.
+                # That is part of the MIDI Standard
+                self.keys -= 1
+
+        elif msg.type == "note_off":
+            self.keys -= 1
+
+            if self.keys < 0:
+                self.keys = 0
+
+        # Rares cases
+        if self.keys < 0:
+            self.keys = 0
+
         """Handle MIDI events from device."""
 
         """
@@ -167,7 +189,7 @@ class MainWindow(QMainWindow):
         text = f"{msg.type} "
 
         if msg.type == 'note_on' or msg.type == 'note_off':
-            text += f"channel {msg.channel} note {number_to_note(msg.note)} [{msg.note},{hex(msg.note)}] velocity {msg.velocity}"
+            text += f"channel {msg.channel} note {number_to_note(msg.note)} [{msg.note},{hex(msg.note)}] velocity {msg.velocity} (keys={self.keys})"
 
             # For fun
             if msg.channel == 0:
